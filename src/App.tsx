@@ -100,7 +100,10 @@ function App() {
 
       await ffmpeg.exec(args);
       const data = await ffmpeg.readFile(outputName);
-      const blob = new Blob([data], { type: 'audio/mpeg' });
+      const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
+      const copiedBytes = new Uint8Array(bytes.byteLength);
+      copiedBytes.set(bytes);
+      const blob = new Blob([copiedBytes], { type: 'audio/mpeg' });
       const url = URL.createObjectURL(blob);
 
       setItems((current) =>
