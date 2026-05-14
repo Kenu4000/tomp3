@@ -57,7 +57,17 @@ button:disabled, .download-link.is-disabled { cursor: not-allowed; opacity: 0.5;
 
 .hero { padding: 14px 0 8px; }
 .eyebrow { color: var(--primary); font-size: 0.8rem; font-weight: 900; letter-spacing: 0.08em; margin: 0 0 6px; text-transform: uppercase; }
-h1 { margin: 0; font-size: clamp(2.15rem, 11vw, 4rem); line-height: 0.95; letter-spacing: -0.06em; }
+h1 {
+  margin: 0;
+  font-size: clamp(2.15rem, 11vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  color: var(--primary);
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 58%, #0f766e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .lead { margin: 14px 0 0; color: var(--muted); font-size: 1.02rem; }
 
 .drop-zone, .settings-card, .notice, .empty-card, .file-card, .app-message {
