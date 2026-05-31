@@ -4,6 +4,7 @@ import { fetchFile } from '@ffmpeg/util';
 import JSZip from 'jszip';
 import coreURL from '@ffmpeg/core?url';
 import wasmURL from '@ffmpeg/core/wasm?url';
+import { decodeNwaToWav } from './nwa';
 
 type Bitrate = '128k' | '192k' | '256k' | '320k';
 type SampleRate = 'original' | '44100' | '48000';
@@ -24,7 +25,7 @@ type ConversionItem = {
 const bitrateOptions: Bitrate[] = ['128k', '192k', '256k', '320k'];
 const sampleRateOptions: SampleRate[] = ['original', '44100', '48000'];
 const channelOptions: Channels[] = ['original', 'mono', 'stereo'];
-const acceptedExtensions = ['wav', 'flac', 'ogg', 'opus', 'm4a', 'aac', 'webm', 'mp4', 'mov', 'mkv', 'mp3'];
+const acceptedExtensions = ['wav', 'nwa', 'flac', 'ogg', 'opus', 'm4a', 'aac', 'webm', 'mp4', 'mov', 'mkv', 'mp3'];
 
 function App() {
   const [items, setItems] = useState<ConversionItem[]>([]);
@@ -79,7 +80,8 @@ function App() {
   };
 
   const convertOne = async (ffmpeg: FFmpeg, item: ConversionItem) => {
-    const inputName = `input-${item.id}.${getExtension(item.file.name) || 'bin'}`;
+    const extension = getExtension(item.file.name);
+    const inputName = `input-${item.id}.${extension === 'nwa' ? 'wav' : extension || 'bin'}`;
     const outputName = `output-${item.id}.mp3`;
     currentIdRef.current = item.id;
 
@@ -92,7 +94,7 @@ function App() {
     );
 
     try {
-      await ffmpeg.writeFile(inputName, await fetchFile(item.file));
+      await ffmpeg.writeFile(inputName, await prepareInputFile(item.file));
       const args = ['-i', inputName, '-vn', '-codec:a', 'libmp3lame', '-b:a', bitrate];
       if (sampleRate !== 'original') args.push('-ar', sampleRate);
       if (channels !== 'original') args.push('-ac', channels === 'mono' ? '1' : '2');
@@ -206,7 +208,7 @@ function App() {
           ファイルを選択
         </button>
         <p>スマホでは上のボタンから追加してください。PCではここにドラッグ&ドロップできます。</p>
-        <small>対応目安: wav / flac / ogg / opus / m4a / aac / webm / mp4 など</small>
+        <small>対応目安: wav / nwa / flac / ogg / opus / m4a / aac / webm / mp4 など</small>
       </section>
 
       <details className="settings-card" open={settingsOpen} onToggle={(event) => setSettingsOpen(event.currentTarget.open)}>
@@ -299,6 +301,15 @@ function FileCard({ item }: { item: ConversionItem }) {
       </a>
     </article>
   );
+}
+
+async function prepareInputFile(file: File) {
+  if (getExtension(file.name) !== 'nwa') {
+    return fetchFile(file);
+  }
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  return decodeNwaToWav(bytes);
 }
 
 function createId() {

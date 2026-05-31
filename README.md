@@ -7,7 +7,7 @@ Vite + React + TypeScriptで作った、静的ホスティング向けのMP3一�
 - 複数ファイルの追加
   - スマホ向けの大きな「ファイルを選択」ボタン
   - PC向けのドラッグ&ドロップ
-- `wav`, `flac`, `ogg`, `opus`, `m4a`, `aac`, `webm`, `mp4`などをMP3へ変換
+- `wav`, `nwa`, `flac`, `ogg`, `opus`, `m4a`, `aac`, `webm`, `mp4`などをMP3へ変換
 - 変換できないファイルはファイル単位で失敗表示し、アプリ全体は停止しません
 - bitrate: `128k` / `192k` / `256k` / `320k`
 - sample rate: `original` / `44100` / `48000`
